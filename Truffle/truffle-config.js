@@ -12,26 +12,41 @@ module.exports = {
       deploymentPollingInterval: 10,
     },
     sepolia: {
-      provider: () => new HDWalletProvider({
-        privateKeys: [process.env.PRIVATE_KEY],
-        providerOrUrl: process.env.INFURA_SEPOLIA_URL.replace('https', 'wss'),
-      }),
+      provider: () => {
+        let providerUrl = process.env.RPC_URL || process.env.INFURA_SEPOLIA_URL;
+
+        if (!providerUrl) {
+          throw new Error("Missing RPC_URL or INFURA_SEPOLIA_URL in .env");
+        }
+
+        // if (providerUrl.startsWith("wss://")) {
+        //   providerUrl = providerUrl.replace("wss://", "https://");
+        // }
+
+        return new HDWalletProvider({
+          privateKeys: [process.env.PRIVATE_KEY],
+          providerOrUrl: providerUrl,
+        });
+      },
       network_id: 11155111,
-      gas: 5000000,
-      gasPrice: 20000000000, // 20 gwei
-      confirmations: 3,
+      // maxFeePerGas: 3e9, // 3 gwei
+      // maxPriorityFeePerGas: 1e9, // 1 gwei
+      // gas: 5000000,
+      // gasPrice: 2000000000, // 20 gwei
+      confirmations: 1,
       timeoutBlocks: 500,
       skipDryRun: true,
       networkCheckTimeout: 10000000,
-      deploymentPollingInterval: 15000,
-      websockets: true,
-      pollingInterval: 15000
+      deploymentPollingInterval: 35000,
+      pollingInterval: 35000,
+      disableConfirmationListener: true,
     },
     mumbai: {
-      provider: () => new HDWalletProvider({
-        privateKeys: [process.env.PRIVATE_KEY],
-        providerOrUrl: process.env.INFURA_MUMBAI_URL,
-      }),
+      provider: () =>
+        new HDWalletProvider({
+          privateKeys: [process.env.PRIVATE_KEY],
+          providerOrUrl: process.env.INFURA_MUMBAI_URL,
+        }),
       network_id: 80001,
       deploymentPollingInterval: 10,
     },

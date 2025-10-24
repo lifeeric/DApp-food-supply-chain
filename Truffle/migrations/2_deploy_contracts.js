@@ -15,14 +15,14 @@ module.exports = async function (deployer) {
   const tokenInastance = await Token.deployed();
 
   await tokenInastance.mint(
-    "0xB6C8325bD553893E4B3dF330BC520Fe619B1a929",
-    web3.utils.toWei("5000", "ether"),
+    "0xB14eB8a9421180F9980Abc2c2f526FD4365675FF",
+    web3.utils.toWei("5000", "ether")
   );
 
   await deployer.deploy(
     Escrow,
     tokenInastance.address,
-    web3.utils.toWei("25", "ether"),
+    web3.utils.toWei("25", "ether")
   );
   const escrowInastance = await Escrow.deployed();
 
@@ -30,6 +30,6 @@ module.exports = async function (deployer) {
     DaliahMarketplace,
     farmerInstance.address,
     distInastance.address,
-    escrowInastance.address,
+    escrowInastance.address
   );
 };
