@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import {
   Card,
   notification,
@@ -33,41 +33,6 @@ import Distributor from "contracts/Distributor.json";
 const projectId = 'f5a3409d86e8aba5b4f4';    
 const projectSecret = '6ec243a8d51d845e08f9a363e6e0ca1b4ebac134a493e936814122bb3f3e154d'; 
 
-const saveFilePinata = async (file) => {
-  if (!beforeUpload(file)) return;
-
-  setLoading(true);
-  try {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
-      method: 'POST',
-      headers: {
-        'pinata_api_key': projectId,
-        'pinata_secret_api_key': projectSecret,
-      },
-      body: formData
-    });
-
-    const data = await response.json();
-    
-    if (data.IpfsHash) {
-      // Handle the IPFS hash as needed
-      // ...existing code...
-    } else {
-      throw new Error('Failed to get IPFS hash');
-    }
-  } catch (error) {
-    console.error("Pinata upload error:", error);
-    notification.error({
-      message: "Error",
-      description: "Failed to upload image: " + error.message
-    });
-  }
-  setLoading(false);
-};
-
 // Add this utility function
 const getEllipsisTxt = (str, n = 6) => {
   if (str) {
@@ -77,12 +42,6 @@ const getEllipsisTxt = (str, n = 6) => {
 };
 
 // Add missing functions and state
-const beforeUpload = (file) => {
-  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  return isJpgOrPng && isLt2M;
-};
-
 const { Title } = Typography;
 
 const Marketplace = () => {
@@ -99,6 +58,70 @@ const Marketplace = () => {
 
   // Add new ref for the form
   const formRef = useRef(null);
+
+  const beforeUpload = useCallback((file) => {
+    const isJpgOrPng =
+      file.type === "image/jpeg" || file.type === "image/png";
+    if (!isJpgOrPng) {
+      notification.error({
+        message: "Error",
+        description: "You can only upload JPG/PNG file",
+      });
+      return false;
+    }
+
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      notification.error({
+        message: "Error",
+        description: "Image must smaller than 2MB",
+      });
+      return false;
+    }
+
+    return true;
+  }, []);
+
+  const saveFilePinata = useCallback(
+    async (file) => {
+      if (!beforeUpload(file)) return;
+
+      setLoading(true);
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch(
+          "https://api.pinata.cloud/pinning/pinFileToIPFS",
+          {
+            method: "POST",
+            headers: {
+              pinata_api_key: projectId,
+              pinata_secret_api_key: projectSecret,
+            },
+            body: formData,
+          },
+        );
+
+        const data = await response.json();
+
+        if (data.IpfsHash) {
+          // Handle the IPFS hash as needed
+          // ...existing code...
+        } else {
+          throw new Error("Failed to get IPFS hash");
+        }
+      } catch (error) {
+        console.error("Pinata upload error:", error);
+        notification.error({
+          message: "Error",
+          description: "Failed to upload image: " + error.message,
+        });
+      }
+      setLoading(false);
+    },
+    [beforeUpload, setLoading],
+  );
 
   const showModal = (harvestID) => {
     setOrderResponse(false);

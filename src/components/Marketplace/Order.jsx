@@ -28,7 +28,6 @@ import {
   LoadingOutlined,
   FileTextOutlined,
 } from "@ant-design/icons";
-const { Title } = Typography;
 import { useMemo, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getEllipsisTxt } from "helpers/formatters";
@@ -39,6 +38,8 @@ import { create } from "ipfs-http-client";
 import FarmerContract from "contracts/Farmer.json";
 import DaliahMarketplace from "contracts/DaliahMarketplace.json";
 import Distributor from "contracts/Distributor.json";
+
+const { Title } = Typography;
 
 // Replace IPFS configuration with Pinata setup
 const projectId = 'f5a3409d86e8aba5b4f4';    

@@ -3,6 +3,7 @@ import React from "react";
 import Banner0 from "./Banner0";
 import Content0 from "./Content0";
 import { enquireScreen } from "enquire-js";
+import "components/static/antMotionStyle.less";
 
 const { Text, Title } = Typography;
 
@@ -133,8 +134,6 @@ export const Content00DataSource = {
     ],
   },
 };
-
-import "components/static/antMotionStyle.less";
 
 const contentStyle = {
   height: "160px",
